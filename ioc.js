@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin
  * 
- * Version : 0.2
+ * Version : 0.3.0
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -20,6 +20,7 @@ define(function() {
       if (typeof console !== "undefined" && console.warn) {
         console.warn(err);
       }
+      throw err;
     }
   };
 
@@ -48,13 +49,19 @@ define(function() {
       }
     };
 
-    this.notifySuccess = function(args) {
+    this.notifySuccess = function(args, ms) {
       var self = this;
-      window.setTimeout(function() {
+      if (typeof ms === "number") {
+        window.setTimeout(function() {
+          for ( var i = 0; i < self._sucesses.length; i++) {
+            callFunction(self._sucesses[i], self._ctx, args);
+          }
+        }, ms);
+      } else {
         for ( var i = 0; i < self._sucesses.length; i++) {
           callFunction(self._sucesses[i], self._ctx, args);
         }
-      });
+      }
     };
   };
 
@@ -131,7 +138,7 @@ define(function() {
           promise.notifySuccess(dependencies);
         });
       } else {
-        promise.notifySuccess(dependencies);
+        promise.notifySuccess(dependencies, 10);
       }
       return promise;
     },

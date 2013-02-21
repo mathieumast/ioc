@@ -1,0 +1,14 @@
+{
+  "name": "ioc",
+  "description": "Inversion of control (IoC) for RequireJS.",
+  "version": "0.3.0",
+  "author": "Mathieu MAST",
+  "license": "MIT",
+  "dependencies"  : {
+    "requirejs"  : ">=2.1.2"
+  },
+  "devDependencies": {
+    "chai": "*",
+  "  mocha": "*"
+  }
+}
