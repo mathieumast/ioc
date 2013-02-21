@@ -8,7 +8,11 @@
     "requirejs"  : ">=2.1.2"
   },
   "devDependencies": {
-    "chai": "*",
-  "  mocha": "*"
+    "phantomjs": "*",
+    "mocha-phantomjs": "*"  
+  },
+  "scripts": {
+    "pretest": "npm install",
+    "test": "node_modules/mocha-phantomjs/bin/mocha-phantomjs test/test.html"
   }
 }
