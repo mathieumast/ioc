@@ -4,60 +4,71 @@ requirejs.config({
     text : "ext/require-plugins/text",
     string : "ext/require-plugins/string",
     number : "ext/require-plugins/number",
-    underscore : "ext/underscore",
-    chai : "ext/chai"
+    underscore : "ext/underscore"
   },
   shim : {
     underscore : {
       exports : "_",
     }
   },
-  deps : [ "chai", "underscore" ],
   ioc : {
-    a : {
-      construct : "A",
+    singleton : {
+      construct : "Obj1",
       scope : "singleton",
       inject : {
-        b : "ioc!b",
-        c : "ioc!c",
-        e : "ioc!e"
-      }
-    },
-
-    b : {
-      construct : "B",
-      scope : "singleton",
-      inject : {
-        d : "ioc!d"
+        string : "string!toto"
       },
       after : "initialize"
     },
 
+    prototype : {
+      construct : "Obj2",
+      scope : "prototype",
+      inject : {
+        string : "string!toto"
+      },
+      after : "initialize"
+    },
+
+    a : {
+      construct : "Obj3",
+      scope : "singleton",
+      inject : {
+        b : "ioc!b",
+        c : "ioc!c",
+        d : "ioc!d"
+      }
+    },
+
+    b : {
+      construct : "Obj3",
+      scope : "singleton",
+    },
+
     c : {
-      construct : "C",
+      construct : "Obj3",
       scope : "singleton",
       inject : {
         file : "text!file.txt",
-        string : "string!blabla",
+        string : "string!titi",
         number : "number!50"
       }
     },
 
     d : {
-      construct : "D",
+      construct : "Obj3",
+      scope : "singleton",
       inject : {
-        string : "string!titi",
-      },
-      scope : "singleton"
+        e : "ioc!e"
+      }
     },
 
     e : {
-      construct : "E",
-      scope : "prototype",
+      construct : "Obj3",
+      scope : "singleton",
       inject : {
-        string : "string!tata"
-      },
-      after : "initialize"
+        string : "string!toto"
+      }
     }
   }
 });

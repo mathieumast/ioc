@@ -1,11 +1,11 @@
-define(function() {
+define([ "underscore" ], function(_) {
 
   var num = 0;
 
-  var E = function() {
+  var Obj = function() {
   };
 
-  _.extend(E.prototype, {
+  _.extend(Obj.prototype, {
 
     num : 0,
 
@@ -13,12 +13,10 @@ define(function() {
      * Function called after injection if it's configured.
      */
     initialize : function() {
-      console.log("initializing E");
       num++;
       this.num = num;
-      console.log(this.num);
     }
   });
 
-  return E;
+  return Obj;
 });
