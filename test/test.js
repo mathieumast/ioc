@@ -20,7 +20,7 @@ suite("test", function() {
     require([ "ioc!singleton" ], function(obj) {
       expect(obj).to.be.a("object");
 
-      // num = 1 (only one initialization because the object is a singleton)
+      // num = 1 (only one initialization because the object is a singleton and it's already initialized)
       expect(obj.num).to.equal(1);
 
       // string = tutu (the object is a singleton)
@@ -81,8 +81,14 @@ suite("test", function() {
       expect(a).to.be.a("object");
       expect(a.b).to.be.a("object");
       expect(a.c).to.be.a("object");
-      expect(a.d).to.be.a("object");
+      expect(a.c.file).to.equal("text");
+      expect(a.c.string).to.equal("titi");
+      expect(a.c.number).to.equal(50);
+      expect(a.c.obj).to.be.a("object");
+      expect(a.c.obj).to.be.a("object");
+      expect(a.c.obj.a).to.equal("a");
       expect(a.d.e).to.be.a("object");
+      expect(a.d.e.string).to.equal("toto");
 
       done();
     }, done);

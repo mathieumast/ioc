@@ -3,7 +3,6 @@ requirejs.config({
     ioc : "ioc",
     text : "ext/require-plugins/text",
     string : "ext/require-plugins/string",
-    number : "ext/require-plugins/number",
     underscore : "ext/underscore"
   },
   shim : {
@@ -12,61 +11,83 @@ requirejs.config({
     }
   },
   ioc : {
+
+    // singleton is a singleton construct with AMD module Obj1
     singleton : {
-      construct : "Obj1",
+      module : "Obj1",
       scope : "singleton",
       inject : {
+        // Inject string "toto" via string plugin
         string : "string!toto"
       },
+      // function "initialize" is called after injection
       after : "initialize"
     },
 
+    // prototype is a prototype construct with AMD module Obj2
     prototype : {
-      construct : "Obj2",
+      module : "Obj2",
       scope : "prototype",
       inject : {
+        // Inject string "toto" via string plugin
         string : "string!toto"
       },
+      // function "initialize" is called after injection
       after : "initialize"
     },
 
+    // a is a singleton construct with AMD module Obj3
     a : {
-      construct : "Obj3",
+      module : "Obj3",
       scope : "singleton",
       inject : {
+        // Inject other AMD modules (a, b and c) managed by ioc.js
         b : "ioc!b",
         c : "ioc!c",
         d : "ioc!d"
       }
     },
 
+    // b is a singleton construct with AMD module Obj3
     b : {
-      construct : "Obj3",
+      module : "Obj3",
       scope : "singleton",
     },
 
+    // c is a singleton construct with AMD module Obj3
     c : {
-      construct : "Obj3",
+      module : "Obj3",
       scope : "singleton",
       inject : {
+        // Inject content of file via text plugin
         file : "text!file.txt",
+        // Inject string "titi" via string plugin
         string : "string!titi",
-        number : "number!50"
+        // Inject number 50
+        number : 50,
+        // Inject object
+        obj : {
+          a : "a"
+        }
       }
     },
 
+    // d is a singleton construct with AMD module Obj3
     d : {
-      construct : "Obj3",
+      module : "Obj3",
       scope : "singleton",
       inject : {
+        // Inject AMD module managed by ioc.js
         e : "ioc!e"
       }
     },
 
+    // e is a singleton construct with AMD module Obj3
     e : {
-      construct : "Obj3",
+      module : "Obj3",
       scope : "singleton",
       inject : {
+        // Inject string "toto" via string plugin
         string : "string!toto"
       }
     }
