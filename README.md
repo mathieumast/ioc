@@ -55,7 +55,7 @@ See configuration example defined in file [requireConfig.js](test/requireConfig.
 
 Tips:
 
-* to inject a string un RequireJS plugins [string.js](test/est/require-plugins/string.js).
+* to inject a string use RequireJS plugins [string.js](test/ext/require-plugins/string.js).
 
 ## Get managed object
 
