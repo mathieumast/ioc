@@ -55,7 +55,7 @@ requirejs.config({
 }
 ```
 
-* `module`: AMD module use to construct object.
+* `module`: AMD module used to construct object.
 * `scope`: scope of object - `singleton` or `prototype`.
 * `args`: construction arguments.
 * `inject`: injection after construction.
@@ -68,8 +68,8 @@ See configuration example defined in file [requireConfig.js](test/requireConfig.
 ## Get managed object
 
 ```js
-require([ "ioc!object" ], function(object) {
-  // object has the injected properties "value ", "person" and "object2"
+require([ "ioc!object1" ], function(object) {
+  // object has the injected properties "value ", "person", "module" and "object2"
 });
 ```
 
