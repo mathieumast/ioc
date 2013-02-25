@@ -12,7 +12,12 @@
     "mocha-phantomjs": "*"  
   },
   "scripts": {
-    "pretest": "npm install",
+    "pretest": "npm install; cp ioc.js test/ioc.js",
     "test": "node_modules/mocha-phantomjs/bin/mocha-phantomjs test/test.html"
+  },
+  "overlay": {
+    "win32": {
+      "pretest": "npm install; copy ioc.js test/ioc.js"
+    }
   }
 }
