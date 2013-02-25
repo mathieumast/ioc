@@ -17,7 +17,7 @@ requirejs.config({
       module : "Obj1",
       scope : "singleton",
       inject : {
-        // Inject string "toto" via string plugin
+        // Inject string "toto"
         string : "toto"
       },
       // function "initialize" is called after injection
@@ -29,7 +29,7 @@ requirejs.config({
       module : "Obj2",
       scope : "prototype",
       inject : {
-        // Inject string "toto" via string plugin
+        // Inject string "toto"
         string : "toto"
       },
       // function "initialize" is called after injection
