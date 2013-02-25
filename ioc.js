@@ -23,6 +23,13 @@ define(function() {
       throw err;
     }
   };
+  
+  /**
+   * Test if object is an array.
+   */
+  var isArray = Array.isArray || function(obj) {
+    return toString.call(obj) == '[object Array]';
+  };
 
   /**
    * Test if elem is in array.
@@ -104,9 +111,13 @@ define(function() {
     if (null === objConf)
       return;
 
-    ioc.loadDependencies(objConf, name, req, onload, config).success(function(dependencies) {
-      ioc.createObj(dependencies, name, req, onload, config).success(function(obj) {
-        ioc.finalize(obj, name, req, onload, config);
+    var argsToLoad = objConf["args"];
+    var injectsToLoad = objConf["inject"];
+    ioc.loadDependencies(argsToLoad, name, req, onload, config).success(function(args) {
+      ioc.loadDependencies(injectsToLoad, name, req, onload, config).success(function(injects) {
+        ioc.createObj(args, injects, name, req, onload, config).success(function(obj) {
+          ioc.finalize(obj, name, req, onload, config);
+        });
       });
     });
   };
@@ -114,26 +125,39 @@ define(function() {
   /**
    * Load dependencies.
    */
-  ioc.loadDependencies = function(objConf, name, req, onload, config) {
+  ioc.loadDependencies = function(depsToLoad, name, req, onload, config) {
     var promise = new Promise(this);
-    var dependencies = {};
+    var dependencies;
+    if (isArray(depsToLoad)) {
+      dependencies = [];
+    } else {
+      dependencies = {};
+    }
     var nb = 0;
-    var inject = objConf["inject"];
     var tempDeps = [];
     var tempProps = [];
-    if (!!inject) {
-      for ( var prop in inject) {
-        var elem = inject[prop];
+    if (!!depsToLoad) {
+      for ( var prop in depsToLoad) {
+        var elem = depsToLoad[prop];
         if (typeof elem === "string") {
           // It's a string, dependency is a AMD module
           if (!isInArray(tempDeps, elem)) {
             nb++;
+            if (isArray(depsToLoad)) {
+              dependencies.push(null);
+            } else {
+              dependencies[prop] = null;
+            }
             tempDeps.push(elem);
             tempProps.push(prop);
           }
         } else {
           // Dependency is not a AMD module
-          dependencies[prop] = elem;
+          if (isArray(depsToLoad)) {
+            dependencies.push(elem);
+          } else {
+            dependencies[prop] = elem;
+          }
         }
       }
     }
@@ -156,12 +180,12 @@ define(function() {
   /**
    * Create object and inject dependencies.
    */
-  ioc.createObj = function(dependencies, name, req, onload, config) {
+  ioc.createObj = function(args, dependencies, name, req, onload, config) {
     var promise = new Promise(this);
     var objConf = ioc.getConf(name, req, onload, config);
-    var module = objConf["module"];
-    req([ module ], function(module) {
-      var obj = new module();
+    var moduleName = objConf["module"];
+    req([ moduleName ], function(module) {
+      var obj = new module(args);
       if (!!dependencies) {
         for ( var prop in dependencies) {
           var dep = dependencies[prop];

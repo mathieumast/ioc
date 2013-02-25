@@ -27,6 +27,11 @@ requirejs.config({
     object : {
       module : "Object", // Object is a AMD module
       scope : "singleton",
+      // Construction arguments
+      args : [
+        50, // Value
+        {a:"a", b:"b"} // Object
+      ],
       inject : {
         // Inject value 50
         value : 50,

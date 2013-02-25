@@ -11,7 +11,7 @@ suite("test", function() {
       // change string of d
       obj.string = "tutu";
       expect(obj.string).to.equal("tutu");
-      
+
       done();
     });
   });
@@ -41,7 +41,7 @@ suite("test", function() {
       // change string of d
       obj.string = "tutu";
       expect(obj.string).to.equal("tutu");
-      
+
       done();
     }, done);
   });
@@ -65,7 +65,7 @@ suite("test", function() {
     require([ "ioc!prototype" ], function(obj) {
       expect(obj).to.be.a("object");
 
-      // num = 3 (twice initialization because the object is a prototype)
+      // num = 3 (thrice initialization because the object is a prototype)
       expect(obj.num).to.equal(3);
 
       // string != tutu but = toto (the object is a prototype)
@@ -90,6 +90,14 @@ suite("test", function() {
       expect(a.d.e).to.be.a("object");
       expect(a.d.e.string).to.equal("toto");
 
+      done();
+    }, done);
+  });
+
+  test("args", function(done) {
+    require([ "ioc!args" ], function(obj) {
+      expect(obj).to.be.a("object");
+      expect(obj.args).to.be.a("array");
       done();
     }, done);
   });

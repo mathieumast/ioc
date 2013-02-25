@@ -90,6 +90,16 @@ requirejs.config({
         // Inject string "toto" via string plugin
         string : "string!toto"
       }
+    },
+
+    // args is a singleton construct with AMD module Obj3 and arguments
+    args : {
+      module : "Obj4",
+      scope : "singleton",
+      args : [
+        "ioc!e",
+        "text!file.txt"
+      ]
     }
   }
 });
