@@ -18,7 +18,7 @@ requirejs.config({
       scope : "singleton",
       inject : {
         // Inject string "toto" via string plugin
-        string : "string!toto"
+        string : "toto"
       },
       // function "initialize" is called after injection
       after : "initialize"
@@ -30,7 +30,7 @@ requirejs.config({
       scope : "prototype",
       inject : {
         // Inject string "toto" via string plugin
-        string : "string!toto"
+        string : "toto"
       },
       // function "initialize" is called after injection
       after : "initialize"
@@ -42,9 +42,9 @@ requirejs.config({
       scope : "singleton",
       inject : {
         // Inject other AMD modules (a, b and c) managed by ioc.js
-        b : "ioc!b",
-        c : "ioc!c",
-        d : "ioc!d"
+        b : "=>ioc!b",
+        c : "=>ioc!c",
+        d : "=>ioc!d"
       }
     },
 
@@ -60,9 +60,9 @@ requirejs.config({
       scope : "singleton",
       inject : {
         // Inject content of file via text plugin
-        file : "text!file.txt",
-        // Inject string "titi" via string plugin
-        string : "string!titi",
+        file : "=>text!file.txt",
+        // Inject string "titi"
+        string : "titi",
         // Inject number 50
         number : 50,
         // Inject object
@@ -78,7 +78,7 @@ requirejs.config({
       scope : "singleton",
       inject : {
         // Inject AMD module managed by ioc.js
-        e : "ioc!e"
+        e : "=>ioc!e"
       }
     },
 
@@ -87,8 +87,8 @@ requirejs.config({
       module : "Obj3",
       scope : "singleton",
       inject : {
-        // Inject string "toto" via string plugin
-        string : "string!toto"
+        // Inject string "toto"
+        string : "toto"
       }
     },
 
@@ -97,8 +97,8 @@ requirejs.config({
       module : "Obj4",
       scope : "singleton",
       args : [
-        "ioc!e",
-        "text!file.txt"
+        "=>ioc!e",
+        "=>text!file.txt"
       ]
     }
   }

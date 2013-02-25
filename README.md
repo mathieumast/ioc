@@ -2,7 +2,7 @@
 
 Inversion of control (IoC) for [RequireJS](http://requirejs.org/).
 
-This plugin allow injection between AMD modules.
+This plugin allow injection in AMD modules.
 
 ## Features
 
@@ -18,27 +18,27 @@ Configure the ioc.js plugin and all injections via the [RequireJS config](http:/
 requirejs.config({
 
   paths : {
-    ioc : "ioc"
+    ioc : "path/to/ioc"
   },
 
   ioc : {
 
-    // object is a singleton construct with AMD module Object
-    object : {
+    // object1 is a singleton construct with AMD module Object
+    object1 : {
       module : "Object", // Object is a AMD module
       scope : "singleton",
       // Construction arguments
       args : [
         50, // Value
-        {a:"a", b:"b"} // Object
+        {a : "a", b : "b"}, // Object
+        object2 : "=>ioc!object2" // AMD module object2 (module is going to load by ioc.js plugin)
       ],
+      // dependencies injection
       inject : {
-        // Inject value 50
-        value : 50,
-        // Inject object
-        person : {firstname:"John",lastname:"Doe"},
-        // Inject other AMD module object2 managed by ioc.js
-        object2 : "ioc!object2"
+        value : 50, // Value
+        person : {firstname : "John", lastname : "Doe"}, // Object
+        module : "=>module", // AMD module (module is going to load by RequireJS)
+        object2 : "=>ioc!object2" // AMD module object2 (module is going to load by ioc.js plugin)
       },
       // function "initialize" is called after injection
       after : "initialize"
@@ -55,12 +55,15 @@ requirejs.config({
 }
 ```
 
+* `module`: AMD module use to construct object.
+* `scope`: scope of object - `singleton` or `prototype`.
+* `args`: construction arguments.
+* `inject`: injection after construction.
+* `after`: callback function called after injection.
+
+References to others AMD module are defined with `=>`.
 
 See configuration example defined in file [requireConfig.js](test/requireConfig.js).
-
-Tips:
-
-* to inject a string use RequireJS plugins [string.js](test/ext/require-plugins/string.js).
 
 ## Get managed object
 

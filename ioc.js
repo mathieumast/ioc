@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin
  * 
- * Version : 0.4.0
+ * Version : 0.5.0
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -139,16 +139,17 @@ define(function() {
     if (!!depsToLoad) {
       for ( var prop in depsToLoad) {
         var elem = depsToLoad[prop];
-        if (typeof elem === "string") {
+        if ((typeof elem === "string") && elem.match(/^\=\>/) !== null) {
           // It's a string, dependency is a AMD module
-          if (!isInArray(tempDeps, elem)) {
+          var moduleName = elem.substring(2);
+          if (!isInArray(tempDeps, moduleName)) {
             nb++;
             if (isArray(depsToLoad)) {
               dependencies.push(null);
             } else {
               dependencies[prop] = null;
             }
-            tempDeps.push(elem);
+            tempDeps.push(moduleName);
             tempProps.push(prop);
           }
         } else {
