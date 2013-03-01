@@ -98,6 +98,11 @@ suite("test", function() {
     require([ "ioc!args" ], function(obj) {
       expect(obj).to.be.a("object");
       expect(obj.args).to.be.a("array");
+      expect(obj.args.length).to.equal(2);
+      expect(obj.args[0]).to.be.a("object");
+      expect(obj.args[0].string).to.equal("toto");
+      expect(obj.args[1]).to.equal("text");
+      expect(obj.string).to.equal("tutu");
       done();
     }, done);
   });

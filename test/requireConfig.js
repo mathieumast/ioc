@@ -92,14 +92,14 @@ requirejs.config({
       }
     },
 
-    // args is a singleton construct with AMD module Obj3 and arguments
+    // args is a singleton construct with AMD module Obj3 and many arguments
     args : {
       module : "Obj4",
       scope : "singleton",
-      args : [
-        "=>ioc!e",
-        "=>text!file.txt"
-      ]
+      args : [ "=>ioc!e", "=>text!file.txt" ],
+      inject : {
+        string : "tutu"
+      }
     }
   }
 });

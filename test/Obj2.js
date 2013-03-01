@@ -2,7 +2,8 @@ define([ "underscore" ], function(_) {
 
   var num = 0;
 
-  var Obj = function() {
+  var Obj = function(args) {
+    this.args = args;
   };
 
   _.extend(Obj.prototype, {

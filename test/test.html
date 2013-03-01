@@ -12,7 +12,7 @@
 <script src="test.js"></script>
 <script>
   onload = function() {
-    mocha.globals([ "script*" ]);
+    mocha.globals([ "*" ]);
     if (window.mochaPhantomJS) {
       mochaPhantomJS.run();
     } else {
