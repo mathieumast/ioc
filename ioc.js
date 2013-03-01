@@ -1,7 +1,7 @@
 /**
- * IoC for RequireJS Plugin
+ * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.6.0
+ * Version : 0.6.1
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -9,10 +9,11 @@
  */
 define(function() {
   "use strict";
-  
-  /*
-   * Compact promise pattern implementation (https://github.com/mathieumast/promise)
-   */ 
+
+  /**
+   * Compact promise pattern implementation
+   * (https://github.com/mathieumast/promise)
+   */
   var Promise = function() {
 
     var Class = function() {
@@ -48,12 +49,13 @@ define(function() {
               joinObjs.push(results[j]);
             }
             notify(promise, "done", joinObjs);
+          } else {
+            notify(promise, "progress", objs);
           }
-          promise.notifyProgress(objs);
         }, function(objs) {
-          promise.notifyFail(objs);
+          notify(promise, "fail", objs);
         }, function(objs) {
-          promise.notifyProgress(objs);
+          notify(promise, "progress", objs);
         });
       }
     };
@@ -107,20 +109,6 @@ define(function() {
     var obj = new Class();
     Class.prototype.initialize.apply(obj, arguments);
     return obj;
-  };
-
-  /**
-   * Call function.
-   */
-  var callFunction = function(funct, ctx, args) {
-    try {
-      funct.call(ctx, args);
-    } catch (err) {
-      if (typeof console !== "undefined" && console.warn) {
-        console.warn(err);
-      }
-      throw err;
-    }
   };
 
   /**
@@ -274,7 +262,7 @@ define(function() {
       }
       var after = objConf["after"];
       if (!!after) {
-        callFunction(obj[after], obj);
+        obj[after].call(obj, args);
       }
       promise.notifyDone(obj);
     });
