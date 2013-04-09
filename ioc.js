@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.6.1
+ * Version : 0.6.2
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -253,7 +253,49 @@ define(function() {
     var objConf = ioc.getConf(name, req, onload, config);
     var moduleName = objConf["module"];
     req([ moduleName ], function(module) {
-      var obj = new module(args);
+      var obj;
+      if (isArray(args)) {
+        switch (args.length) {
+        case 0:
+          obj = new module();
+          break;
+        case 1:
+          obj = new module(args[0]);
+          break;
+        case 2:
+          obj = new module(args[0], args[1]);
+          break;
+        case 3:
+          obj = new module(args[0], args[1], args[2]);
+          break;
+        case 4:
+          obj = new module(args[0], args[1], args[2], args[3]);
+          break;
+        case 5:
+          obj = new module(args[0], args[1], args[2], args[3], args[4]);
+          break;
+        case 6:
+          obj = new module(args[0], args[1], args[2], args[3], args[4], args[5]);
+          break;
+        case 7:
+          obj = new module(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+          break;
+        case 8:
+          obj = new module(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+          break;
+        case 9:
+          obj = new module(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+          break;
+        case 10:
+          obj = new module(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+          break;
+        default:
+          throw new Error("Max arguments : 10");
+        }
+      } else {
+        obj = new module();
+      }
+
       if (!!dependencies) {
         for ( var prop in dependencies) {
           var dep = dependencies[prop];

@@ -2,8 +2,8 @@ define([ "underscore" ], function(_) {
 
   var num = 0;
 
-  var Obj = function(args) {
-    this.args = args;
+  var Obj = function() {
+    this.args = Array.prototype.slice.call(arguments);
   };
 
   _.extend(Obj.prototype, {
