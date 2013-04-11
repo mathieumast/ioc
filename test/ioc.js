@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.6.2
+ * Version : 0.6.3
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -9,107 +9,6 @@
  */
 define(function() {
   "use strict";
-
-  /**
-   * Compact promise pattern implementation
-   * (https://github.com/mathieumast/promise)
-   */
-  var Promise = function() {
-
-    var Class = function() {
-    };
-
-    var addCallback = function(promise, type, callback) {
-      if (typeof callback === "function") {
-        promise.callbacks[type].push(callback);
-      }
-    };
-
-    var notify = function(promise, type, objs) {
-      if (promise.step === "progress") {
-        promise.step = type;
-        window.setTimeout(function() {
-          for ( var i = 0; i < promise.callbacks[type].length; i++) {
-            var callback = promise.callbacks[type][i];
-            callback.apply(promise, objs);
-          }
-        }, 1);
-      }
-    };
-
-    var join = function(promise, promises) {
-      var results = [], remaining = promises.length;
-      for ( var i = 0; i < promises.length; i++) {
-        promises[i].index = i;
-        promises[i].then(function(objs) {
-          results[this.index] = objs;
-          if (--remaining === 0) {
-            var joinObjs = [];
-            for ( var j = 0; j < results.length; j++) {
-              joinObjs.push(results[j]);
-            }
-            notify(promise, "done", joinObjs);
-          } else {
-            notify(promise, "progress", objs);
-          }
-        }, function(objs) {
-          notify(promise, "fail", objs);
-        }, function(objs) {
-          notify(promise, "progress", objs);
-        });
-      }
-    };
-
-    Class.prototype = {
-
-      initialize : function() {
-        this.callbacks = {
-          done : [],
-          fail : [],
-          progress : []
-        };
-        this.step = "progress";
-        var promises = Array.prototype.slice.call(arguments);
-        if (promises.length > 0) {
-          join(this, promises);
-        }
-      },
-
-      notifyDone : function() {
-        notify(this, "done", Array.prototype.slice.call(arguments));
-      },
-
-      notifyFail : function() {
-        notify(this, "fail", Array.prototype.slice.call(arguments));
-      },
-
-      notifyProgress : function() {
-        notify(this, "progress", Array.prototype.slice.call(arguments));
-      },
-
-      then : function(done, fail, progress) {
-        this.done(done);
-        this.fail(fail);
-        this.progress(progress);
-      },
-
-      done : function(callback) {
-        addCallback(this, "done", callback);
-      },
-
-      fail : function(callback) {
-        addCallback(this, "fail", callback);
-      },
-
-      progress : function(callback) {
-        addCallback(this, "progress", callback);
-      }
-    };
-
-    var obj = new Class();
-    Class.prototype.initialize.apply(obj, arguments);
-    return obj;
-  };
 
   /**
    * Test if object is an array.
@@ -180,20 +79,18 @@ define(function() {
     var res1 = ioc.loadDependencies(argsToLoad, name, req, onload, config);
     var res2 = ioc.loadDependencies(injectsToLoad, name, req, onload, config);
 
-    var join = new Promise(res1, res2);
-    join.then(function(args, injects) {
+    Promise.when(res1, res2).then(function(args, injects) {
       ioc.createObj(args, injects, name, req, onload, config).then(function(obj) {
         ioc.finalize(obj, name, req, onload, config);
       }, error);
     }, error);
-
   };
 
   /**
    * Load dependencies.
    */
   ioc.loadDependencies = function(depsToLoad, name, req, onload, config) {
-    var promise = new Promise();
+    var future = Promise.future();
     var dependencies;
     if (isArray(depsToLoad)) {
       dependencies = [];
@@ -237,19 +134,19 @@ define(function() {
           var dep = arguments[i];
           dependencies[prop] = dep;
         }
-        promise.notifyDone(dependencies);
+        future.notifyDone(dependencies);
       });
     } else {
-      promise.notifyDone(dependencies);
+      future.notifyDone(dependencies);
     }
-    return promise;
+    return future.promise();
   };
 
   /**
    * Create object and inject dependencies.
    */
   ioc.createObj = function(args, dependencies, name, req, onload, config) {
-    var promise = new Promise();
+    var future = Promise.future();
     var objConf = ioc.getConf(name, req, onload, config);
     var moduleName = objConf["module"];
     req([ moduleName ], function(module) {
@@ -306,9 +203,9 @@ define(function() {
       if (!!after) {
         obj[after].call(obj, args);
       }
-      promise.notifyDone(obj);
+      future.notifyDone(obj);
     });
-    return promise;
+    return future.promise();
   };
 
   /**
@@ -326,3 +223,108 @@ define(function() {
 
   return ioc;
 });
+
+/**
+ * Compact promise pattern implementation
+ * (https://github.com/mathieumast/promise)
+ * 
+ * Version : 0.5.0
+ * 
+ * Copyright (c) 2013, Mathieu MAST
+ * 
+ * Licensed under the MIT license
+ */
+var Promise = {};
+{
+  var _P = function() {
+    var _callbacks = {
+      done : [],
+      fail : [],
+      progress : []
+    };
+    this.callbacks = function() {
+      return {
+        done : _callbacks.done.slice(),
+        fail : _callbacks.fail.slice(),
+        progress : _callbacks.progress.slice()
+      };
+    };
+    this.then = function(done, fail, progress) {
+      var addCallback = function(type, callback) {
+        if (typeof callback === "function") {
+          _callbacks[type].push(callback);
+        }
+      };
+      addCallback("done", done);
+      addCallback("fail", fail);
+      addCallback("progress", progress);
+    };
+  };
+
+  var _F = function() {
+    var _step = "progress", _promise = new _P();
+    this.promise = function() {
+      return _promise;
+    };
+    this.then = function(done, fail, progress) {
+      _promise.then(done, fail, progress);
+    };
+    this.notify = function(type, array) {
+      if (_step === "progress") {
+        _step = type;
+        window.setTimeout(function() {
+          var _callbacks = _promise.callbacks();
+          for ( var i = 0; i < _callbacks[type].length; i++) {
+            var callback = _callbacks[type][i];
+            callback.apply(_promise, array);
+          }
+        }, 1);
+      }
+    };
+  };
+  _F.prototype.notifyDone = function() {
+    this.notify("done", Array.prototype.slice.call(arguments));
+  };
+  _F.prototype.notifyFail = function() {
+    this.notify("fail", Array.prototype.slice.call(arguments));
+  };
+  _F.prototype.notifyProgress = function() {
+    this.notify("progress", Array.prototype.slice.call(arguments));
+  };
+
+  var _W = function(promises) {
+    var _future = new _F(), _results = [], _remaining = promises.length;
+    for ( var i = 0; i < promises.length; i++) {
+      promises[i].index = i;
+      promises[i].then(function(obj) {
+        _results[this.index] = obj;
+        if (--_remaining === 0) {
+          var joinObjs = [];
+          for ( var j = 0; j < _results.length; j++) {
+            joinObjs.push(_results[j]);
+          }
+          _F.prototype.notifyDone.apply(_future, joinObjs);
+        } else {
+          _future.notifyProgress(obj);
+        }
+      }, function(obj) {
+        _future.notifyFail(obj);
+      }, function(obj) {
+        _future.notifyProgress(obj);
+      });
+    }
+    this.promise = function() {
+      return _future.promise();
+    };
+    this.then = function(done, fail, progress) {
+      _future.then(done, fail, progress);
+    };
+  };
+
+  Promise.future = function() {
+    return new _F();
+  };
+  Promise.when = function() {
+    return new _W(Array.prototype.slice.call(arguments));
+  };
+};
