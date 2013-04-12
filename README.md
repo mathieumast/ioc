@@ -10,6 +10,10 @@ This plugin allow injection in AMD modules.
 * Simple configuration via the [RequireJS config](http://requirejs.org/docs/api.html#config).
 * fully compatible with other requireJS plugins.
 
+## Dependencies
+
+* Need the promise implementation [proFmk](https://github.com/mathieumast/proFmk).
+
 ## Configuration
 
 Configure the ioc.js plugin and all injections via the [RequireJS config](http://requirejs.org/docs/api.html#config):
@@ -18,7 +22,8 @@ Configure the ioc.js plugin and all injections via the [RequireJS config](http:/
 requirejs.config({
 
   paths : {
-    ioc : "path/to/ioc"
+    ioc : "path/to/ioc",
+    proFmk : "path/to/proFmk"
   },
 
   ioc : {

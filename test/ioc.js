@@ -1,34 +1,14 @@
 /**
  * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.6.3
+ * Version : 0.7.0
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
  * Licensed under the MIT license
  */
-define(function() {
+define(["proFmk"], function(proFmk) {
   "use strict";
-
-  /**
-   * Test if object is an array.
-   */
-  var isArray = Array.isArray || function(obj) {
-    return toString.call(obj) == "[object Array]";
-  };
-
-  /**
-   * Test if elem is in array.
-   */
-  var isInArray = function(elem, array) {
-    var len = array.length;
-    for ( var i = 0; i < len; i++) {
-      if (array[i] === elem) {
-        return true;
-      }
-    }
-    return false;
-  };
 
   /**
    * ioc plugin.
@@ -79,7 +59,7 @@ define(function() {
     var res1 = ioc.loadDependencies(argsToLoad, name, req, onload, config);
     var res2 = ioc.loadDependencies(injectsToLoad, name, req, onload, config);
 
-    Promise.when(res1, res2).then(function(args, injects) {
+    proFmk.when(res1, res2).then(function(args, injects) {
       ioc.createObj(args, injects, name, req, onload, config).then(function(obj) {
         ioc.finalize(obj, name, req, onload, config);
       }, error);
@@ -90,9 +70,9 @@ define(function() {
    * Load dependencies.
    */
   ioc.loadDependencies = function(depsToLoad, name, req, onload, config) {
-    var future = Promise.future();
+    var future = proFmk.future();
     var dependencies;
-    if (isArray(depsToLoad)) {
+    if (proFmk.isArray(depsToLoad)) {
       dependencies = [];
     } else {
       dependencies = {};
@@ -106,9 +86,9 @@ define(function() {
         if ((typeof elem === "string") && elem.match(/^\=\>/) !== null) {
           // It's a string, dependency is a AMD module
           var moduleName = elem.substring(2);
-          if (!isInArray(tempDeps, moduleName)) {
+          if (-1 === proFmk.indexOf(tempDeps, moduleName)) {
             nb++;
-            if (isArray(depsToLoad)) {
+            if (proFmk.isArray(depsToLoad)) {
               dependencies.push(null);
             } else {
               dependencies[prop] = null;
@@ -118,7 +98,7 @@ define(function() {
           }
         } else {
           // Dependency is not a AMD module
-          if (isArray(depsToLoad)) {
+          if (proFmk.isArray(depsToLoad)) {
             dependencies.push(elem);
           } else {
             dependencies[prop] = elem;
@@ -146,12 +126,12 @@ define(function() {
    * Create object and inject dependencies.
    */
   ioc.createObj = function(args, dependencies, name, req, onload, config) {
-    var future = Promise.future();
+    var future = proFmk.future();
     var objConf = ioc.getConf(name, req, onload, config);
     var moduleName = objConf["module"];
     req([ moduleName ], function(module) {
       var obj;
-      if (isArray(args)) {
+      if (proFmk.isArray(args)) {
         switch (args.length) {
         case 0:
           obj = new module();
@@ -223,108 +203,3 @@ define(function() {
 
   return ioc;
 });
-
-/**
- * Compact promise pattern implementation
- * (https://github.com/mathieumast/promise)
- * 
- * Version : 0.5.0
- * 
- * Copyright (c) 2013, Mathieu MAST
- * 
- * Licensed under the MIT license
- */
-var Promise = {};
-{
-  var _P = function() {
-    var _callbacks = {
-      done : [],
-      fail : [],
-      progress : []
-    };
-    this.callbacks = function() {
-      return {
-        done : _callbacks.done.slice(),
-        fail : _callbacks.fail.slice(),
-        progress : _callbacks.progress.slice()
-      };
-    };
-    this.then = function(done, fail, progress) {
-      var addCallback = function(type, callback) {
-        if (typeof callback === "function") {
-          _callbacks[type].push(callback);
-        }
-      };
-      addCallback("done", done);
-      addCallback("fail", fail);
-      addCallback("progress", progress);
-    };
-  };
-
-  var _F = function() {
-    var _step = "progress", _promise = new _P();
-    this.promise = function() {
-      return _promise;
-    };
-    this.then = function(done, fail, progress) {
-      _promise.then(done, fail, progress);
-    };
-    this.notify = function(type, array) {
-      if (_step === "progress") {
-        _step = type;
-        window.setTimeout(function() {
-          var _callbacks = _promise.callbacks();
-          for ( var i = 0; i < _callbacks[type].length; i++) {
-            var callback = _callbacks[type][i];
-            callback.apply(_promise, array);
-          }
-        }, 1);
-      }
-    };
-  };
-  _F.prototype.notifyDone = function() {
-    this.notify("done", Array.prototype.slice.call(arguments));
-  };
-  _F.prototype.notifyFail = function() {
-    this.notify("fail", Array.prototype.slice.call(arguments));
-  };
-  _F.prototype.notifyProgress = function() {
-    this.notify("progress", Array.prototype.slice.call(arguments));
-  };
-
-  var _W = function(promises) {
-    var _future = new _F(), _results = [], _remaining = promises.length;
-    for ( var i = 0; i < promises.length; i++) {
-      promises[i].index = i;
-      promises[i].then(function(obj) {
-        _results[this.index] = obj;
-        if (--_remaining === 0) {
-          var joinObjs = [];
-          for ( var j = 0; j < _results.length; j++) {
-            joinObjs.push(_results[j]);
-          }
-          _F.prototype.notifyDone.apply(_future, joinObjs);
-        } else {
-          _future.notifyProgress(obj);
-        }
-      }, function(obj) {
-        _future.notifyFail(obj);
-      }, function(obj) {
-        _future.notifyProgress(obj);
-      });
-    }
-    this.promise = function() {
-      return _future.promise();
-    };
-    this.then = function(done, fail, progress) {
-      _future.then(done, fail, progress);
-    };
-  };
-
-  Promise.future = function() {
-    return new _F();
-  };
-  Promise.when = function() {
-    return new _W(Array.prototype.slice.call(arguments));
-  };
-};

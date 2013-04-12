@@ -1,7 +1,7 @@
 {
   "name": "ioc",
   "description": "Inversion of control (IoC) for RequireJS.",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "author": "Mathieu MAST",
   "license": "MIT",
   "dependencies"  : {
@@ -9,15 +9,18 @@
   },
   "devDependencies": {
     "phantomjs": "*",
-    "mocha-phantomjs": "*"  
+    "mocha-phantomjs": "*",
+    "mocha": "*",
+    "chai": "*",
+    "underscore": "*"
   },
   "scripts": {
-    "pretest": "npm install; cp ioc.js test/ioc.js",
+    "pretest": "npm install; cp ioc.js test/ioc.js; cp node_modules/requirejs/require.js test/ext/require.js; cp node_modules/mocha/mocha.js test/ext/mocha.js; cp node_modules/mocha/mocha.css test/ext/mocha.css; cp node_modules/chai/chai.js test/ext/chai.js; cp node_modules/underscore/underscore.js test/ext/underscore.js",
     "test": "node_modules/mocha-phantomjs/bin/mocha-phantomjs test/test.html"
   },
   "overlay": {
     "win32": {
-      "pretest": "npm install; copy ioc.js test/ioc.js"
+      "pretest": "npm install; copy ioc.js test/ioc.js; copy node_modules/requirejs/require.js test/ext/require.js; copy node_modules/mocha/mocha.js test/ext/mocha.js; copy node_modules/mocha/mocha.css test/ext/mocha.css; copy node_modules/chai/chai.js test/ext/chai.js; copy node_modules/underscore/underscore.js test/ext/underscore.js"
     }
   }
 }
