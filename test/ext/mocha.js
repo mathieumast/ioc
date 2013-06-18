@@ -1,5 +1,6 @@
 ;(function(){
 
+
 // CommonJS require()
 
 function require(p){
@@ -31,11 +32,11 @@ require.register = function (path, fn){
 require.relative = function (parent) {
     return function(p){
       if ('.' != p.charAt(0)) return require(p);
-
+      
       var path = parent.split('/')
         , segs = p.split('/');
       path.pop();
-
+      
       for (var i = 0; i < segs.length; i++) {
         var seg = segs[i];
         if ('..' == seg) path.pop();
@@ -51,9 +52,9 @@ require.register("browser/debug.js", function(module, exports, require){
 
 module.exports = function(type){
   return function(){
+    
   }
 };
-
 }); // module: browser/debug.js
 
 require.register("browser/diff.js", function(module, exports, require){
@@ -804,6 +805,7 @@ Hook.prototype.error = function(err){
   this._error = err;
 };
 
+
 }); // module: hook.js
 
 require.register("interfaces/bdd.js", function(module, exports, require){
@@ -817,7 +819,7 @@ var Suite = require('../suite')
 
 /**
  * BDD-style interface:
- *
+ * 
  *      describe('Array', function(){
  *        describe('#indexOf()', function(){
  *          it('should return -1 when not present', function(){
@@ -829,7 +831,7 @@ var Suite = require('../suite')
  *          });
  *        });
  *      });
- *
+ * 
  */
 
 module.exports = function(suite){
@@ -874,7 +876,7 @@ module.exports = function(suite){
      * and callback `fn` containing nested suites
      * and/or tests.
      */
-
+  
     context.describe = context.context = function(title, fn){
       var suite = Suite.create(suites[0], title);
       suites.unshift(suite);
@@ -954,19 +956,19 @@ var Suite = require('../suite')
 
 /**
  * TDD-style interface:
- *
+ * 
  *     exports.Array = {
  *       '#indexOf()': {
  *         'should return -1 when the value is not present': function(){
- *
+ *           
  *         },
  *
  *         'should return the correct index when the value is present': function(){
- *
+ *           
  *         }
  *       }
  *     };
- *
+ * 
  */
 
 module.exports = function(suite){
@@ -1004,7 +1006,6 @@ module.exports = function(suite){
     }
   }
 };
-
 }); // module: interfaces/exports.js
 
 require.register("interfaces/index.js", function(module, exports, require){
@@ -1027,27 +1028,27 @@ var Suite = require('../suite')
 
 /**
  * QUnit-style interface:
- *
+ * 
  *     suite('Array');
- *
+ *     
  *     test('#length', function(){
  *       var arr = [1,2,3];
  *       ok(arr.length == 3);
  *     });
- *
+ *     
  *     test('#indexOf()', function(){
  *       var arr = [1,2,3];
  *       ok(arr.indexOf(1) == 0);
  *       ok(arr.indexOf(2) == 1);
  *       ok(arr.indexOf(3) == 2);
  *     });
- *
+ *     
  *     suite('String');
- *
+ *     
  *     test('#length', function(){
  *       ok('foo'.length == 3);
  *     });
- *
+ * 
  */
 
 module.exports = function(suite){
@@ -1090,7 +1091,7 @@ module.exports = function(suite){
     /**
      * Describe a "suite" with the given `title`.
      */
-
+  
     context.suite = function(title){
       if (suites.length > 1) suites.shift();
       var suite = Suite.create(suites[0], title);
@@ -1128,7 +1129,7 @@ var Suite = require('../suite')
  *          suiteSetup(function(){
  *
  *          });
- *
+ *          
  *          test('should return -1 when not present', function(){
  *
  *          });
@@ -1548,7 +1549,7 @@ Mocha.prototype.run = function(fn){
   var options = this.options;
   var runner = new exports.Runner(suite);
   var reporter = new this._reporter(runner);
-  runner.ignoreLeaks = false !== options.ignoreLeaks;
+  runner.ignoreLeaks = options.ignoreLeaks;
   runner.asyncOnly = options.asyncOnly;
   if (options.grep) runner.grep(options.grep, options.invert);
   if (options.globals) runner.globals(options.globals);
@@ -1709,7 +1710,7 @@ exports.colors = {
 /**
  * Default symbol map.
  */
-
+ 
 exports.symbols = {
   ok: '✓',
   err: '✖',
@@ -2333,6 +2334,8 @@ function HTML(runner, root) {
   });
 
   runner.on('test end', function(test){
+    window.scrollTo(0, document.body.scrollHeight);
+
     // TODO: add to stats
     var percent = stats.tests / this.total * 100 | 0;
     if (progress) progress.update(percent).draw(ctx);
@@ -3077,7 +3080,7 @@ exports = module.exports = Min;
 
 function Min(runner) {
   Base.call(this, runner);
-
+  
   runner.on('start', function(){
     // clear screen
     process.stdout.write('\u001b[2J');
@@ -3097,10 +3100,10 @@ F.prototype = Base.prototype;
 Min.prototype = new F;
 Min.prototype.constructor = Min;
 
-
 }); // module: reporters/min.js
 
 require.register("reporters/nyan.js", function(module, exports, require){
+
 /**
  * Module dependencies.
  */
@@ -3246,39 +3249,44 @@ NyanCat.prototype.drawRainbow = function(){
 NyanCat.prototype.drawNyanCat = function(status) {
   var self = this;
   var startWidth = this.scoreboardWidth + this.trajectories[0].length;
-  var color = '\u001b[' + startWidth + 'C';
-  var padding = '';
-  
-  write(color);
-  write('_,------,');
-  write('\n');
-  
-  write(color);
-  padding = self.tick ? '  ' : '   ';
-  write('_|' + padding + '/\\_/\\ ');
-  write('\n');
-  
-  write(color);
-  padding = self.tick ? '_' : '__';
-  var tail = self.tick ? '~' : '^';
-  var face;
-  switch (status) {
-    case 'pass':
-      face = '( ^ .^)';
-      break;
-    case 'fail':
-      face = '( o .o)';
-      break;
-    default:
-      face = '( - .-)';
-  }
-  write(tail + '|' + padding + face + ' ');
-  write('\n');
-  
-  write(color);
-  padding = self.tick ? ' ' : '  ';
-  write(padding + '""  "" ');
-  write('\n');
+
+  [0, 1, 2, 3].forEach(function(index) {
+    write('\u001b[' + startWidth + 'C');
+
+    switch (index) {
+      case 0:
+        write('_,------,');
+        write('\n');
+        break;
+      case 1:
+        var padding = self.tick ? '  ' : '   ';
+        write('_|' + padding + '/\\_/\\ ');
+        write('\n');
+        break;
+      case 2:
+        var padding = self.tick ? '_' : '__';
+        var tail = self.tick ? '~' : '^';
+        var face;
+        switch (status) {
+          case 'pass':
+            face = '( ^ .^)';
+            break;
+          case 'fail':
+            face = '( o .o)';
+            break;
+          default:
+            face = '( - .-)';
+        }
+        write(tail + '|' + padding + face + ' ');
+        write('\n');
+        break;
+      case 3:
+        var padding = self.tick ? ' ' : '  ';
+        write(padding + '""  "" ');
+        write('\n');
+        break;
+    }
+  });
 
   this.cursorUp(this.numberOfLines);
 };
@@ -3738,7 +3746,7 @@ function XUnit(runner) {
   runner.on('pass', function(test){
     tests.push(test);
   });
-
+  
   runner.on('fail', function(test){
     tests.push(test);
   });
@@ -3755,7 +3763,7 @@ function XUnit(runner) {
     }, false));
 
     tests.forEach(test);
-    console.log('</testsuite>');
+    console.log('</testsuite>');    
   });
 }
 
@@ -4057,7 +4065,8 @@ var EventEmitter = require('browser/events').EventEmitter
   , Test = require('./test')
   , utils = require('./utils')
   , filter = utils.filter
-  , keys = utils.keys;
+  , keys = utils.keys
+  , noop = function(){};
 
 /**
  * Non-enumerable globals.
@@ -4108,15 +4117,6 @@ function Runner(suite) {
   this.grep(/.*/);
   this.globals(this.globalProps().concat(['errno']));
 }
-
-/**
- * Wrapper for setImmediate, process.nextTick, or browser polyfill.
- *
- * @param {Function} fn
- * @api private
- */
-
-Runner.immediately = global.setImmediate || process.nextTick;
 
 /**
  * Inherit from `EventEmitter.prototype`.
@@ -4246,7 +4246,7 @@ Runner.prototype.fail = function(test, err){
   if ('string' == typeof err) {
     err = new Error('the string "' + err + '" was thrown, throw an Error :)');
   }
-
+  
   this.emit('fail', test, err);
 };
 
@@ -4303,7 +4303,7 @@ Runner.prototype.hook = function(name, fn){
     });
   }
 
-  Runner.immediately(function(){
+  process.nextTick(function(){
     next(0);
   });
 };
@@ -4546,16 +4546,14 @@ Runner.prototype.run = function(fn){
   var self = this
     , fn = fn || function(){};
 
-  function uncaught(err){
-    self.uncaught(err);
-  }
-
   debug('start');
 
   // callback
   this.on('end', function(){
     debug('end');
-    process.removeListener('uncaughtException', uncaught);
+    process.removeListener('uncaughtException', function(err){
+      self.uncaught(err);
+    });
     fn(self.failures);
   });
 
@@ -4567,7 +4565,9 @@ Runner.prototype.run = function(fn){
   });
 
   // uncaught exception
-  process.on('uncaughtException', uncaught);
+  process.on('uncaughtException', function(err){
+    self.uncaught(err);
+  });
 
   return this;
 };
@@ -5005,7 +5005,7 @@ exports.indexOf = function(arr, obj, start){
 
 /**
  * Array#reduce (<=IE8)
- *
+ * 
  * @param {Array} array
  * @param {Function} fn
  * @param {Object} initial value
@@ -5239,6 +5239,34 @@ process.stdout = {};
 global = window;
 
 /**
+ * next tick implementation.
+ */
+
+process.nextTick = (function(){
+  // postMessage behaves badly on IE8
+  if (window.ActiveXObject || !window.postMessage) {
+    return function(fn){ fn() };
+  }
+
+  // based on setZeroTimeout by David Baron
+  // - http://dbaron.org/log/20100309-faster-timeouts
+  var timeouts = []
+    , name = 'mocha-zero-timeout'
+
+  window.addEventListener('message', function(e){
+    if (e.source == window && e.data == name) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (timeouts.length) timeouts.shift()();
+    }
+  }, true);
+
+  return function(fn){
+    timeouts.push(fn);
+    window.postMessage(name, '*');
+  }
+})();
+
+/**
  * Remove uncaughtException listener.
  */
 
@@ -5269,32 +5297,6 @@ process.on = function(e, fn){
 
   var Mocha = window.Mocha = require('mocha'),
       mocha = window.mocha = new Mocha({ reporter: 'html' });
-
-  var immediateQueue = []
-    , immediateTimeout;
-
-  function timeslice() {
-    var immediateStart = new Date().getTime();
-    while (immediateQueue.length && (new Date().getTime() - immediateStart) < 100) {
-      immediateQueue.shift()();
-    }
-    if (immediateQueue.length) {
-      immediateTimeout = setTimeout(timeslice, 0);
-    } else {
-      immediateTimeout = null;
-    }
-  }
-
-  /**
-   * High-performance override of Runner.immediately.
-   */
-
-  Mocha.Runner.immediately = function(callback) {
-    immediateQueue.push(callback);
-    if (!immediateTimeout) {
-      immediateTimeout = setTimeout(timeslice, 0);
-    }
-  };
 
   /**
    * Override ui to ensure that the ui functions are initialized.

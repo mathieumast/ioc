@@ -1,15 +1,9 @@
 requirejs.config({
   paths : {
     ioc : "ioc",
-    proFmk : "ext/proFmk",
+    profmk : "ext/profmk",
     text : "ext/require-plugins/text",
-    string : "ext/require-plugins/string",
-    underscore : "ext/underscore"
-  },
-  shim : {
-    underscore : {
-      exports : "_",
-    }
+    string : "ext/require-plugins/string"
   },
   ioc : {
 

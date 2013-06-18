@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="ext/mocha.css" />
-<script src="ext/chai.js"></script>
-<script src="ext/mocha.js"></script>
-<script>
-  mocha.setup("tdd");
-</script>
-<script data-main="requireConfig" src="ext/require.js"></script>
-<script src="test.js"></script>
-<script>
-  onload = function() {
-    mocha.globals([ "*" ]);
-    if (window.mochaPhantomJS) {
-      mochaPhantomJS.run();
-    } else {
-      mocha.run();
-    }
-  }
-</script>
-</head>
-<body>
-	<div id="mocha"></div>
-</body>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="ext/mocha.css" />
+        <script src="ext/chai.js"></script>
+        <script src="ext/mocha.js"></script>
+        <script>
+            mocha.setup("tdd");
+        </script>
+        <script data-main="requireConfig" src="ext/require.js"></script>
+        <script src="test.js"></script>
+        <script>
+            onload = function() {
+                mocha.globals(["*"]);
+                if (window.mochaPhantomJS) {
+                    mochaPhantomJS.run();
+                } else {
+                    mocha.run();
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="mocha"></div>
+    </body>
 </html>

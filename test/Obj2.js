@@ -1,23 +1,20 @@
-define([ "underscore" ], function(_) {
+define(function() {
 
-  var num = 0;
+    var num = 0;
 
-  var Obj = function() {
-    this.args = Array.prototype.slice.call(arguments);
-  };
+    var Obj = function() {
+        this.args = Array.prototype.slice.call(arguments);
+    };
 
-  _.extend(Obj.prototype, {
-
-    num : 0,
+    Obj.prototype.num = 0;
 
     /**
      * Function called after injection if it's configured.
      */
-    initialize : function() {
-      num++;
-      this.num = num;
-    }
-  });
+    Obj.prototype.initialize = function() {
+        num++;
+        this.num = num;
+    };
 
-  return Obj;
+    return Obj;
 });
