@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.8.0
+ * Version : 0.8.1
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -90,7 +90,12 @@ define(["profmk"], function(profmk) {
                 var elem = depsToLoad[prop];
                 if (profmk.isString(elem) && elem.match(/^\=\>/) !== null) {
                     // It's a string, dependency is a AMD module
-                    var moduleName = elem.substring(2);
+                    var moduleName;
+                    if (elem.match(/!/)) {
+                        moduleName = elem.substring(2);
+                    } else {
+                        moduleName = req.toUrl(elem.substring(2));
+                    }
                     if (-1 === profmk.indexOf(tempDeps, moduleName)) {
                         nb++;
                         if (profmk.isArray(depsToLoad)) {

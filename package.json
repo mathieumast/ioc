@@ -1,7 +1,7 @@
 {
     "name": "ioc",
     "description": "Inversion of control (IoC) for RequireJS.",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "author": "Mathieu MAST",
     "license": "MIT",
     "repository": {
