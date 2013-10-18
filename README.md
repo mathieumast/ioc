@@ -12,7 +12,7 @@ This plugin allow injection in AMD modules.
 
 ## Dependencies
 
-* Need the promise implementation [proFmk](https://github.com/mathieumast/proFmk).
+* Need the promise implementation [profmk](https://github.com/mathieumast/profmk).
 
 ## Configuration
 
