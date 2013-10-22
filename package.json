@@ -1,7 +1,7 @@
 {
     "name": "ioc",
     "description": "Inversion of control (IoC) for RequireJS.",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "author": "Mathieu MAST",
     "license": "MIT",
     "repository": {
@@ -10,13 +10,13 @@
     },
     "dependencies": {
         "requirejs": ">=2.1.2",
-        "profmk": ">=0.5.6"
+        "profmk": ">=0.7.0"
     },
     "devDependencies": {
-        "phantomjs": "1.9.1-0",
-        "mocha-phantomjs": "2.0.3",
-        "mocha": "1.8.1",
-        "chai": "1.7.0"
+        "phantomjs": "1.9.2-2",
+        "mocha-phantomjs": "3.1.5",
+        "mocha": "1.13.0",
+        "chai": "1.8.1"
     },
     "scripts": {
         "pretest": "cp ioc.js test/ioc.js; cp node_modules/profmk/profmk.js test/ext/profmk.js; cp node_modules/requirejs/require.js test/ext/require.js; cp node_modules/mocha/mocha.js test/ext/mocha.js; cp node_modules/mocha/mocha.css test/ext/mocha.css; cp node_modules/chai/chai.js test/ext/chai.js",

@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.8.1
+ * Version : 0.8.2
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
