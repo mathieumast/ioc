@@ -1,7 +1,7 @@
 /*
  * Compact promise pattern implementation and more. (https://github.com/mathieumast/profmk)
  * 
- * Version : 0.7.0
+ * Version : 0.7.1
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -46,9 +46,10 @@
      */
     profmk.indexOf = Array.prototype.indexOf || function(array, item) {
         var i = 0, l = array.length;
-        for (; i < l; i++)
+        for (; i < l; i++) {
             if (array[i] === item)
                 return i;
+        }
         return -1;
     };
 
@@ -97,9 +98,11 @@
      */
     profmk.extend = function(dest) {
         var args = profmk.slice(arguments, 1), i = 0, l = args.length, prop;
-        for (; i < l; i++)
-            for (prop in args[i])
+        for (; i < l; i++) {
+            for (prop in args[i]) {
                 dest[prop] = args[i][prop];
+            }
+        }
         return dest;
     };
 
@@ -120,102 +123,83 @@
             case 4:
                 return new func(array[0], array[1], array[2], array[3]);
             default:
-                for (; i < l; i++)
+                for (; i < l; i++) {
                     q.push('array[' + i + ']');
+                }
                 return eval('new func(' + q.join(',') + ');');
         }
     };
 
     /*
-     * Subcription implementation.
+     * Subscriber definition.
      */
-    var _Subscription = function() {
-        var _subscribers = {};
+    var _Subscriber = function(channel, callback, priority, context) {
+        this.channel = channel;
+        this.originalCallback = callback;
+        this.callback = callback;
+        this.priority = priority ? priority : 10;
+        this.context = context ? context : profmk;
+    };
+    /*
+     * Register implementation.
+     */
+    var _Register = function(subscribersMap) {
+        var _subscribersMap = subscribersMap;
         /*
-         * Add subscriber.
+         * Subscribe.
          */
-        this.subscribe = function(channel, callback, priority, context) {
-            if (!_subscribers[channel]) {
-                _subscribers[channel] = {callbacks: [], priorities: [], contexts: []};
-            }
-            if (profmk.isFunction(callback)) {
-                if (!profmk.isNumber(priority))
-                    priority = 10;
-                if (!context)
-                    context = this;
-                var _priorities = _subscribers[channel].priorities, _callbacks = _subscribers[channel].callbacks, _contexts = _subscribers[channel].contexts, i = _priorities.length - 1, lastpriority = 0;
-                for (; i >= 0; i--) {
-                    lastpriority = _priorities[i];
-                    if (priority < lastpriority) {
-                        _callbacks.splice(i + 1, 0, callback);
-                        _priorities.splice(i + 1, 0, priority);
-                        _contexts.splice(i + 1, 0, context);
-                        break;
-                    }
-                }
-                if (priority < lastpriority) {
-                    _callbacks.unshift(callback);
-                    _priorities.unshift(priority);
-                    _contexts.unshift(context);
-                } else {
-                    _callbacks.push(callback);
-                    _priorities.push(priority);
-                    _contexts.push(context);
+        this.subscribe = function(subscriber) {
+            if (!_subscribersMap[subscriber.channel])
+                _subscribersMap[subscriber.channel] = [];
+            if (!profmk.isFunction(subscriber.callback))
+                return this;
+            var subs = _subscribersMap[subscriber.channel], i = subs.length - 1;
+            subscriber.i = i + 1;
+            for (; i >= 0; i--) {
+                if (subscriber.priority >= subs[i].priority) {
+                    subs.splice(i + 1, 0, subscriber);
+                    return this;
                 }
             }
+            subs.unshift(subscriber);
             return this;
         };
         /*
-         * Remove subscriber.
+         * Unsubscribe.
          */
         this.unsubscribe = function(channel, callback) {
-            if (!_subscribers[channel])
+            if (!_subscribersMap[channel])
                 return this;
             if (!callback)
-                _subscribers[channel] = null;
+                _subscribersMap[channel] = null;
             else {
-                var _priorities = _subscribers[channel].priorities, _callbacks = _subscribers[channel].callbacks, _contexts = _subscribers[channel].contexts, i = _priorities.length - 1;
+                var array = _subscribersMap[channel], i = array.length - 1;
                 for (; i >= 0; i--) {
-                    if (_callbacks[i] === callback) {
-                        _callbacks.splice(i, 1);
-                        _priorities.splice(i, 1);
-                        _contexts.splice(i, 1);
-                    }
+                    if (array[i].originalCallback === callback)
+                        array.splice(i, 1);
                 }
             }
             return this;
-        };
-        /*
-         * Return copy of callback subscribers for the channel.
-         */
-        this.callbacks = function(channel) {
-            if (!_subscribers[channel])
-                return [];
-            return profmk.slice(_subscribers[channel].callbacks);
-        };
-        /*
-         * Return copy of context subscribers for the channel.
-         */
-        this.contexts = function(channel) {
-            if (!_subscribers[channel])
-                return [];
-            return profmk.slice(_subscribers[channel].contexts);
         };
     };
 
     /*
-     * Publication implementation.
+     * Publisher implementation.
      */
-    var _Publication = function(subscription) {
+    var _Publisher = function(subscribersMap) {
+        var _subscribersMap = subscribersMap;
         /*
          * Publish data in array.
          */
         this.publishArray = function(channel, array) {
             profmk.async(this, function() {
-                var _callbacks = subscription.callbacks(channel), _contexts = subscription.contexts(channel), i = 0, l = _callbacks.length;
-                for (; i < l; i++)
-                    if (_callbacks[i].apply(_contexts[i], array) === false)
+                if (!_subscribersMap[channel])
+                  _subscribersMap[channel] = [];
+                var subs = profmk.slice(_subscribersMap[channel]), i = 0, l = !subs ? 0 : subs.length;
+                for (; i < l; i++) {
+                    if (subs[i].callback.apply(subs[i].context, array) === false)
                         return false;
+                }
                 return true;
             });
         };
@@ -225,32 +209,48 @@
      * Mediator implementation.
      */
     var _Mediator = function() {
-        this._subscription = new _Subscription();
-        this._publication = new _Publication(this._subscription);
+        var _subscribersMap = {};
+        this._register = new _Register(_subscribersMap);
+        this._publisher = new _Publisher(_subscribersMap);
     };
     /*
      * Add subscriber.
      */
     _Mediator.prototype.subscribe = function(channel, callback, priority, context) {
-        this._subscription.subscribe(channel, callback, priority, context);
+        this._register.subscribe(new _Subscriber(channel, callback, priority, context));
+        return this;
+    };
+    /*
+     * Add subscriber for one event.
+     */
+    _Mediator.prototype.subscribeOnce = function(channel, callback, priority, context) {
+        var sub = new _Subscriber(channel, callback, priority, context), self = this;
+        sub.callback = function() {
+            var res = sub.originalCallback.apply(context, arguments);
+            self._register.unsubscribe(sub.channel, sub.originalCallback);
+            return res;
+        };
+        this._register.subscribe(sub);
+        return this;
     };
     /*
      * Remove subscriber.
      */
     _Mediator.prototype.unsubscribe = function(channel, callback) {
-        this._subscription.unsubscribe(channel, callback);
+        this._register.unsubscribe(channel, callback);
+        return this;
     };
     /*
      * Publish data in arguments.
      */
     _Mediator.prototype.publish = function(channel) {
-        return this._publication.publishArray(channel, profmk.slice(arguments, 1));
+        return this._publisher.publishArray(channel, profmk.slice(arguments, 1));
     };
     /*
      * Publish data in array.
      */
     _Mediator.prototype.publishArray = function(channel, array) {
-        return this._publication.publishArray(channel, array);
+        return this._publisher.publishArray(channel, array);
     };
     /*
      * Get a new Mediator object.
@@ -262,16 +262,16 @@
     /*
      * Promise implementation.
      */
-    var _Promise = function() {
-        this._subscription = new _Subscription();
+    var _Promise = function(subscribersMap) {
+        this._register = new _Register(subscribersMap);
     };
     /*
      * Add handlers to be called when the Promise object is done, failed, or still in progress.
      */
     _Promise.prototype.then = function(done, fail, progress, context) {
-        this._subscription.subscribe('done', done, context);
-        this._subscription.subscribe('fail', fail, context);
-        this._subscription.subscribe('progress', progress, context);
+        this._register.subscribe(new _Subscriber('done', done, null, context));
+        this._register.subscribe(new _Subscriber('fail', fail, null, context));
+        this._register.subscribe(new _Subscriber('progress', progress, null, context));
         return this;
     };
 
@@ -279,12 +279,12 @@
      * Future implementation.
      */
     var _Future = function() {
-        var _step = 'progress', _promise = new _Promise(), _publication = new _Publication(_promise._subscription);
+        var _step = 'progress', _subscribersMap = {}, _promise = new _Promise(_subscribersMap), _publisher = new _Publisher(_subscribersMap);
         this.context = this;
         this._notify = function(type, array) {
             if (_step === 'progress') {
                 _step = type;
-                _publication.publishArray(type, array);
+                _publisher.publishArray(type, array);
             }
             return this;
         };

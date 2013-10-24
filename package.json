@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "requirejs": ">=2.1.2",
-        "profmk": ">=0.7.0"
+        "profmk": ">=0.7.1"
     },
     "devDependencies": {
         "phantomjs": "1.9.2-2",
