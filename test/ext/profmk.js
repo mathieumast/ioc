@@ -1,7 +1,7 @@
 /*
  * Compact promise pattern implementation and more. (https://github.com/mathieumast/profmk)
  * 
- * Version : 0.7.1
+ * Version : 0.7.2
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -110,7 +110,7 @@
      * Create a new instance of function and arguments in array.
      */
     profmk.instantiate = function(func, array) {
-        var i = 0, l = array.length, q = [];
+        var i = 0, l = profmk.isArray(array) ? array.length : 0, q = [];
         switch (l) {
             case 0:
                 return new func();

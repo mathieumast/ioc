@@ -1,7 +1,7 @@
 /**
  * IoC for RequireJS Plugin (https://github.com/mathieumast/ioc)
  * 
- * Version : 0.8.2
+ * Version : 0.8.3
  * 
  * Copyright (c) 2013, Mathieu MAST
  * 
@@ -77,7 +77,7 @@ define(["profmk"], function(profmk) {
     ioc.loadDependencies = function(depsToLoad, name, req, onload, config) {
         var future = profmk.future();
         var dependencies;
-        if (profmk.isArray(depsToLoad)) {
+        if (!depsToLoad || profmk.isArray(depsToLoad)) {
             dependencies = [];
         } else {
             dependencies = {};
